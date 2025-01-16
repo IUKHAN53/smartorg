@@ -64,7 +64,7 @@ new class extends Component {
         <div class="flex flex-col w-full mt-6 space-y-5 md:flex-row lg:mt-0 md:space-y-0 md:space-x-5">
             @forelse ($orgCharts as $orgChart)
                 <x-app.org-card
-                    :href="route('orgchart.view', $orgChart->id)"
+                    href="organization/view/{{ $orgChart->id }}"
                     target="_blank"
                     :title="$orgChart->name"
                     :description="$orgChart->description"
@@ -78,7 +78,7 @@ new class extends Component {
 
         <!-- Modal Implementation -->
         <div
-            class="fixed inset-0 z-50 flex items-center justify-center bg-gray-600 bg-opacity-50"
+            class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-100 bg-opacity-50"
             x-show="showModal"
             x-transition:enter="transition ease-out duration-300"
             x-transition:enter-start="opacity-0 scale-90"

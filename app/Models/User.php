@@ -43,7 +43,7 @@ class User extends WaveUser
     protected static function boot()
     {
         parent::boot();
-        
+
         // Listen for the creating event of the model
         static::creating(function ($user) {
             // Check if the username attribute is empty
@@ -66,5 +66,11 @@ class User extends WaveUser
             // Assign the default role
             $user->assignRole( config('wave.default_user_role', 'registered') );
         });
+    }
+
+
+    public function orgCharts()
+    {
+        return $this->hasMany(OrgChart::class);
     }
 }
