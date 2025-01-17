@@ -22,13 +22,8 @@
                      class="absolute right-0 mt-2 hidden bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-lg shadow-lg z-50">
                     <ul>
                         <li>
-                            <button
-                                class="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-700">
-                                Edit
-                            </button>
-                        </li>
-                        <li>
-                            <button
+                            <button wire:click="deleteOrgChart({{ $id }})"
+                                    wire:confirm="Are you sure you want to delete this orgchart?"
                                 class="w-full px-4 py-2 text-left text-sm text-red-700 dark:text-red-300 hover:bg-gray-100 dark:hover:bg-zinc-700">
                                 Delete
                             </button>

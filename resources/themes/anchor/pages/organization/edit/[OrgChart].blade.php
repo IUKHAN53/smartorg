@@ -15,7 +15,8 @@ new class extends Component {
     public $name;
     public $description;
     public $is_shared;
-    public $data; // For file upload
+    public $data;
+    public $dataContent = null;
     protected $rules = [
         'name' => 'required|string|max:255',
         'description' => 'nullable|string',
@@ -36,37 +37,61 @@ new class extends Component {
         $validatedData = $this->validate();
 
         if ($this->data) {
-            // Extract JSON content from the uploaded file
             $jsonContent = $this->data->get();
-             json_decode($jsonContent);
-             if (json_last_error() !== JSON_ERROR_NONE) {
-                 $this->addError('data', 'Uploaded file contains invalid JSON.');
-                 return;
-             }
+            json_decode($jsonContent);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                $this->addError('data', 'Uploaded file contains invalid JSON.');
+                return;
+            }
             $validatedData['json_data'] = $jsonContent;
         } else {
             $validatedData['json_data'] = $this->orgChart->json_data;
-        }
-
-        if ($validatedData['is_shared'] && !$this->orgChart->share_uuid) {
-            $validatedData['share_uuid'] = Str::uuid();
-        } elseif (!$validatedData['is_shared']) {
-            $validatedData['share_uuid'] = null;
         }
 
         // Update the OrgChart model
         $this->orgChart->update([
             'name' => $validatedData['name'],
             'description' => $validatedData['description'],
-            'is_shared' => $validatedData['is_shared'],
-            'share_uuid' => $validatedData['share_uuid'],
+            'is_shared' => $validatedData['is_shared'] ?? false,
             'json_data' => $validatedData['json_data'],
         ]);
 
+        $this->orgChart->refresh();
+
         session()->flash('message', 'Organization Chart updated successfully.');
+    }
+
+    public function updatedData()
+    {
+        if ($this->data) {
+            try {
+                // Retrieve the file content
+                $jsonContent = $this->data->get();
+
+                // Attempt to decode the JSON to ensure it's valid
+                $decoded = json_decode($jsonContent, true);
+
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    // If valid, format it for pretty display
+                    $this->dataContent = json_encode($decoded, JSON_PRETTY_PRINT);
+                } else {
+                    // If invalid, set an error message
+                    $this->dataContent = 'Invalid JSON content.';
+                    $this->addError('data', 'Uploaded file contains invalid JSON.');
+                }
+            } catch (\Exception $e) {
+                // Handle any unexpected errors
+                $this->dataContent = 'Error processing the file.';
+                $this->addError('data', 'There was an error uploading the file.');
+            }
+        } else {
+            // If no file is uploaded, reset dataContent
+            $this->dataContent = null;
+        }
     }
 }
 ?>
+
 
 <x-layouts.app>
     @volt()
@@ -102,7 +127,7 @@ new class extends Component {
         @endif
 
         <x-elements.card>
-            <form wire:submit.prevent="saveOrgChart" class="mx-auto space-y-6">
+            <form class="mx-auto space-y-6">
                 <!-- Name Field -->
                 <div>
                     <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
@@ -131,7 +156,7 @@ new class extends Component {
                     @error('description') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
                 </div>
 
-                <!-- Toggle Field -->
+                <!-- Share Toggle -->
                 <div class="flex items-center space-x-4">
                     <label for="is_shared" class="relative inline-flex items-center cursor-pointer">
                         <input
@@ -153,32 +178,19 @@ new class extends Component {
                         OrgChart?</label>
                 </div>
 
-                <!-- Shared URL and Button -->
-                <div class="flex items-start flex-col" x-show="is_shared">
-                    <span class="text-sm text-gray-600">
-                        /public/{{ $orgChart->share_uuid ?? 'your-share-uuid' }}
-                    </span>
-                    <x-button
-                        type="button"
-                        size="sm"
-                        class="mt-2 border border-gray-700 text-gray-700 hover:bg-gray-700
-                               hover:text-white flex items-center"
-                        onclick="window.open('/public/{{ $orgChart->share_uuid ?? 'your-share-uuid' }}', '_blank')"
-                    >
-                        <!-- Eye Icon -->
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2" fill="none"
-                             viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M2.458 12C3.732 7.943 7.522 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274
-                                     4.057-5.064 7-9.542 7-4.478 0-8.268-2.943-9.542-7z" />
-                        </svg>
-                        View Public Page
-                    </x-button>
-                </div>
-
-                <!-- Data Field -->
+                @if($this->orgChart->share_uuid && $this->is_shared)
+                    <div class="flex items-start flex-col">
+                        <span class="text-sm text-gray-600">
+                            {{ url('/') . '/public/' . ($orgChart->share_uuid ?? 'your-share-uuid') }}
+                        </span>
+                        <button type="button"
+                                onclick="window.open('/public/{{ $orgChart->share_uuid ?? 'your-share-uuid' }}', '_blank')"
+                                class="gap-1 text-white bg-gray-400 hover:bg-gray-500 focus:ring-4 focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-gray-200 dark:hover:bg-gray-400 me-2 mb-2">
+                            @svg('heroicon-o-eye', 'h-5 w-5')
+                            View Public Link
+                        </button>
+                    </div>
+                @endif
                 <div>
                     <label for="data" class="block text-sm font-medium text-gray-700">Data</label>
                     <div
@@ -209,7 +221,7 @@ new class extends Component {
                                     <span>Upload a file</span>
                                     <input
                                         id="file-upload"
-                                        wire:model="data"
+                                        wire:model.defer="data"
                                         type="file"
                                         class="sr-only"
                                     />
@@ -220,16 +232,27 @@ new class extends Component {
                             <p class="text-xs text-gray-500">JSON up to 2MB</p>
                         </div>
                     </div>
-                </div>
-
-                <!-- Submit Button Aligned to Far Right -->
-                <div class="flex justify-end">
-                    <x-button type="submit" size="lg">
-                        Save Changes
-                    </x-button>
+                    <div wire:loading wire:target="data" class="mt-2 mb-3">
+                        <span class="text-sm text-blue-600">Uploading...</span>
+                    </div>
+                    <div class="flex justify-end mt-2">
+                        <x-button type="submit" size="lg" wire:click="saveOrgChart">
+                            Save Changes
+                        </x-button>
+                    </div>
+                    @if ($dataContent)
+                        <div class="mt-4">
+                            <p class="text-sm text-gray-700">Uploaded file
+                                content: {{ $data->getClientOriginalName() }}</p>
+                            <pre class="mt-2 p-2 bg-gray-100 rounded-md overflow-auto text-xs text-gray-600">
+{{ $dataContent }}
+                            </pre>
+                        </div>
+                    @endif
                 </div>
             </form>
         </x-elements.card>
     </x-app.container>
     @endvolt
 </x-layouts.app>
+

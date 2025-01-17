@@ -9,10 +9,13 @@ name('organization.view');
 <x-layouts.app>
     <x-app.container x-data='{ showModal: false }' class="lg:space-y-6" x-cloak>
         <div class="flex justify-between">
-            <x-app.heading
-                title="{{$orgChart->name}}"
-                :border="false"
-            />
+            <div class="space-y-0.5 flex flex-row">
+                <h3 class="text-lg sm:text-xl font-semibold tracking-tight dark:text-zinc-100">{{$orgChart->name}}</h3>
+                <span style="max-height: 28px"
+                    class="top-5 left-5 px-2 py-1 text-xs font-medium bg-green-100 text-green-600 rounded-lg ml-2">
+                    {{$orgChart->is_shared ? 'Public' : 'Private'}}
+                </span>
+            </div>
             <a
                 type="button"
                 href="edit/{{$orgChart->id}}"
@@ -26,9 +29,9 @@ name('organization.view');
             </div>
         @endif
         <div class="flex flex-col w-full mt-6 space-y-5 md:flex-row lg:mt-0 md:space-y-0 md:space-x-5">
-           <x-elements.card>
+            <x-elements.card>
                 @livewire('chart-component', ['jsonData' => $orgChart->json_data])
-           </x-elements.card>
+            </x-elements.card>
         </div>
     </x-app.container>
 </x-layouts.app>

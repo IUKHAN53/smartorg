@@ -30,5 +30,11 @@ class OrgChart extends Model
                 $orgChart->share_uuid = (string) Str::uuid();
             }
         });
+
+        static::updating(function ($orgChart) {
+            if ($orgChart->is_shared && !$orgChart->share_uuid) {
+                $orgChart->share_uuid = (string) Str::uuid();
+            }
+        });
     }
 }
