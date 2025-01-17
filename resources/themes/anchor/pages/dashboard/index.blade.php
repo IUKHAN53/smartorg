@@ -26,16 +26,13 @@ new class extends Component {
     {
         $this->validate();
 
-        // Save the new OrgChart
         auth()->user()->orgCharts()->create([
             'name' => $this->name,
             'description' => $this->description,
         ]);
 
-        // Reload orgCharts
         $this->orgCharts = auth()->user()->orgCharts;
 
-        // Reset form and close modal
         $this->reset(['name', 'description']);
         $this->showModal = false;
 
@@ -46,7 +43,7 @@ new class extends Component {
 
 
 <x-layouts.app>
-    @volt('dashboard')
+    @volt
     <x-app.container x-data='{ showModal: false }' class="lg:space-y-6" x-cloak>
         <div class="flex justify-between">
             <x-app.heading
@@ -60,11 +57,15 @@ new class extends Component {
                 Add OrgChart
             </button>
         </div>
-
+        @if(session()->has('message'))
+            <div class="p-4 mt-4 text-green-700 bg-green-100 border border-green-300 rounded-md">
+                {{ session('message') }}
+            </div>
+        @endif
         <div class="flex flex-col w-full mt-6 space-y-5 md:flex-row lg:mt-0 md:space-y-0 md:space-x-5">
             @forelse ($orgCharts as $orgChart)
                 <x-app.org-card
-                    :href="route('orgchart.view', $orgChart->id)"
+                    href="organization/{{ $orgChart->id }}"
                     target="_blank"
                     :title="$orgChart->name"
                     :description="$orgChart->description"
@@ -75,22 +76,34 @@ new class extends Component {
                 <p class="text-gray-500">No OrgCharts available. Click "Add OrgChart" to create one.</p>
             @endforelse
         </div>
-
-        <!-- Modal Implementation -->
         <div
-            class="fixed inset-0 z-50 flex items-center justify-center bg-gray-600 bg-opacity-50"
+            class="fixed inset-0 z-50 bg-gray-500 bg-opacity-50 transition-opacity duration-300"
             x-show="showModal"
-            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter="ease-out duration-300"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-50"
+            x-transition:leave="ease-in duration-200"
+            x-transition:leave-start="opacity-50"
+            x-transition:leave-end="opacity-0"
+            @keydown.escape.window="showModal = false"
+            x-cloak
+        ></div>
+
+        <div
+            class="fixed inset-0 z-50 flex items-center justify-center"
+            x-show="showModal"
+            x-transition:enter="ease-out duration-300"
             x-transition:enter-start="opacity-0 scale-90"
             x-transition:enter-end="opacity-100 scale-100"
-            x-transition:leave="transition ease-in duration-200"
+            x-transition:leave="ease-in duration-200"
             x-transition:leave-start="opacity-100 scale-100"
             x-transition:leave-end="opacity-0 scale-90"
-            @keydown.escape.window="showModal = false"
+            x-cloak
         >
             <div
-                class="bg-white rounded-lg shadow-lg w-full max-w-md mx-auto p-6"
-                @click.away="showModal = false">
+                class="bg-white rounded-lg shadow-lg w-full max-w-lg mx-auto p-8"
+                @click.away="showModal = false"
+            >
                 <div class="flex justify-end items-center mb-4">
                     <button
                         type="button"
@@ -106,10 +119,12 @@ new class extends Component {
                 </div>
                 <div>
                     <div class="flex justify-center flex-col">
-                        <h1 class="mb-4 text-4xl  leading-none text-center tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white">
-                            Add New Organization</h1>
-                        <p class="mb-6 text-lg font-normal text-center text-gray-500 lg:text-xl sm:px-16 xl:px-48 dark:text-gray-400">
-                            Fill in the details below to create a new Organization</p>
+                        <h1 class="mb-4 text-4xl leading-none text-center tracking-tight text-gray-900 dark:text-white">
+                            Add New OrgChart
+                        </h1>
+                        <p class="mb-6 text-lg font-normal text-center text-gray-900 dark:text-gray-400">
+                            Please put your information below
+                        </p>
                     </div>
                     <form wire:submit.prevent="saveOrgChart">
                         <div class="mb-4">
@@ -146,12 +161,6 @@ new class extends Component {
                 </div>
             </div>
         </div>
-
-        @if(session()->has('message'))
-            <div class="p-4 mt-4 text-green-700 bg-green-100 border border-green-300 rounded-md">
-                {{ session('message') }}
-            </div>
-        @endif
     </x-app.container>
     @endvolt
 </x-layouts.app>

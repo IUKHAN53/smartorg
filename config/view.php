@@ -1,7 +1,8 @@
 <?php
 
-return [
+use Illuminate\Support\Facades\App;
 
+return [
     /*
     |--------------------------------------------------------------------------
     | View Storage Paths

@@ -10,6 +10,7 @@
             }
         }
     </script>
+    @stack('styles')
 </head>
 <body x-data class="flex flex-col lg:min-h-screen bg-zinc-50 dark:bg-zinc-900 @if(config('wave.dev_bar')){{ 'pb-10' }}@endif">
 
@@ -39,8 +40,7 @@
     @endif
     @include('theme::partials.footer-scripts')
     {{ $javascript ?? '' }}
-    
-
+    @stack('scripts')
 </body>
 </html>
 
