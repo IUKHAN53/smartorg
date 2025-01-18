@@ -35,22 +35,10 @@ new class extends Component {
     {
         $validatedData = $this->validate();
 
-        if ($this->data) {
-            $jsonContent = $this->data->get();
-            json_decode($jsonContent);
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                $this->addError('data', 'Uploaded file contains invalid JSON.');
-                return;
-            }
-            $validatedData['json_data'] = $jsonContent;
-        } else {
-            $validatedData['json_data'] = $this->orgChart->json_data;
-        }
         $this->orgChart->update([
             'name' => $validatedData['name'],
             'description' => $validatedData['description'],
             'is_shared' => $validatedData['is_shared'] ?? false,
-            'json_data' => $validatedData['json_data'],
         ]);
         Notification::make()
             ->title('OrgChart updated successfully!')
@@ -58,32 +46,47 @@ new class extends Component {
             ->send();
     }
 
-    public function updatedData()
+    public function updatedData(): void
     {
-        if ($this->data) {
-            try {
-                $jsonContent = $this->data->get();
-                $decoded = json_decode($jsonContent, true);
-                if (json_last_error() === JSON_ERROR_NONE) {
-                    $this->dataContent = json_encode($decoded, JSON_PRETTY_PRINT);
-                } else {
-                    $this->dataContent = 'Invalid JSON content.';
-                    $this->addError('data', 'Uploaded file contains invalid JSON.');
-                }
-            } catch (\Exception $e) {
-                $this->dataContent = 'Error processing the file.';
-                $this->addError('data', 'There was an error uploading the file.');
-            }
-        } else {
+        $this->validateOnly('data');
+        if (!$this->data) {
             $this->dataContent = null;
+            return;
+        }
+        try {
+            $jsonContent = $this->data->get();
+            $decoded = json_decode($jsonContent, true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                $this->dataContent = json_encode($decoded, JSON_PRETTY_PRINT);
+                $this->orgChart->json_data = $jsonContent;
+                $this->orgChart->save();
+                Notification::make()
+                    ->title('OrgChart data updated successfully!')
+                    ->success()
+                    ->send();
+            } else {
+                $this->dataContent = 'Invalid JSON content.';
+                Notification::make()
+                    ->title('Invalid JSON content.')
+                    ->danger()
+                    ->send();
+            }
+        } catch (\Exception $e) {
+            $this->dataContent = 'Error processing the file.';
+            Notification::make()
+                    ->title('Error processing the file.')
+                    ->danger()
+                    ->send();
         }
     }
+
 
     public function fillValues()
     {
         $this->name = $this->orgChart->name;
         $this->description = $this->orgChart->description;
         $this->is_shared = $this->orgChart->is_shared;
+        $this->dataContent = $this->orgChart->json_data;
     }
 }
 ?>
@@ -92,7 +95,6 @@ new class extends Component {
 <x-layouts.app>
     @volt()
     <x-app.container
-        x-data="{ showModal: false, is_shared: @entangle('is_shared') }"
         class="lg:space-y-6"
         x-cloak
     >
@@ -226,7 +228,7 @@ new class extends Component {
                     @if ($dataContent)
                         <div class="mt-4">
                             <p class="text-sm text-gray-700">
-                                Uploaded file content: {{ $data->getClientOriginalName() }}
+                                Uploaded file content: {{$data ? $data->getClientOriginalName() : ''}}
                             </p>
                             <div
                                 x-data="{ showJson: false }"

@@ -18,34 +18,22 @@ class ChartComponent extends Component
     }
 
     private function transformData($data)
-    {
-        // Group items by their parentId
-        $items = [];
-        foreach ($data as $item) {
-            $items[$item['parentId']][] = [
-                'id' => (string)$item['id'],
-                'name' => $item['fullname'],
-                'title' => $item['position_name'],
-                'image' => 'data:image/jpeg;base64,' . $item['imagepath'], // Convert imagepath to Base64
-            ];
-        }
+{
+    $transformed = [];
 
-        // Recursively build the hierarchy
-        $buildTree = function ($parentId = null) use (&$buildTree, $items) {
-            $tree = [];
-            if (isset($items[$parentId])) {
-                foreach ($items[$parentId] as $item) {
-                    $item['children'] = $buildTree($item['id']);
-                    $tree[] = $item;
-                }
-            }
-            return $tree;
-        };
-
-        // OrgChart expects a single root node; adjust as needed
-        $rootItems = $buildTree(null);
-        return count($rootItems) === 1 ? $rootItems[0] : $rootItems;
+    foreach ($data as $item) {
+        $transformed[] = [
+            'id'            => (string)$item['id'],
+            'parentId'      => $item['parentId'] ? (string)$item['parentId'] : null,
+            'name'          => $item['fullname'],
+            'title'  => $item['position_name'],
+            'image'      => 'data:image/jpeg;base64,' . $item['imagepath'],
+        ];
     }
+
+    return $transformed;
+}
+
 
 
     public function render()
