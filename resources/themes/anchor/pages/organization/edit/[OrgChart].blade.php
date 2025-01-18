@@ -1,5 +1,6 @@
 <?php
 
+use Filament\Notifications\Notification;
 use Illuminate\Support\Str;
 use Livewire\WithFileUploads;
 use function Laravel\Folio\{middleware, name};
@@ -27,9 +28,7 @@ new class extends Component {
     public function mount($orgChart)
     {
         $this->orgChart = $orgChart;
-        $this->name = $orgChart->name;
-        $this->description = $orgChart->description;
-        $this->is_shared = $orgChart->is_shared;
+        $this->fillValues();
     }
 
     public function saveOrgChart()
@@ -47,47 +46,44 @@ new class extends Component {
         } else {
             $validatedData['json_data'] = $this->orgChart->json_data;
         }
-
-        // Update the OrgChart model
         $this->orgChart->update([
             'name' => $validatedData['name'],
             'description' => $validatedData['description'],
             'is_shared' => $validatedData['is_shared'] ?? false,
             'json_data' => $validatedData['json_data'],
         ]);
-
-        $this->orgChart->refresh();
-
-        session()->flash('message', 'Organization Chart updated successfully.');
+        Notification::make()
+            ->title('OrgChart updated successfully!')
+            ->success()
+            ->send();
     }
 
     public function updatedData()
     {
         if ($this->data) {
             try {
-                // Retrieve the file content
                 $jsonContent = $this->data->get();
-
-                // Attempt to decode the JSON to ensure it's valid
                 $decoded = json_decode($jsonContent, true);
-
                 if (json_last_error() === JSON_ERROR_NONE) {
-                    // If valid, format it for pretty display
                     $this->dataContent = json_encode($decoded, JSON_PRETTY_PRINT);
                 } else {
-                    // If invalid, set an error message
                     $this->dataContent = 'Invalid JSON content.';
                     $this->addError('data', 'Uploaded file contains invalid JSON.');
                 }
             } catch (\Exception $e) {
-                // Handle any unexpected errors
                 $this->dataContent = 'Error processing the file.';
                 $this->addError('data', 'There was an error uploading the file.');
             }
         } else {
-            // If no file is uploaded, reset dataContent
             $this->dataContent = null;
         }
+    }
+
+    public function fillValues()
+    {
+        $this->name = $this->orgChart->name;
+        $this->description = $this->orgChart->description;
+        $this->is_shared = $this->orgChart->is_shared;
     }
 }
 ?>
@@ -117,18 +113,8 @@ new class extends Component {
             </a>
         </div>
 
-        @if (session()->has('message'))
-            <div
-                class="p-4 mt-4 text-green-700 bg-green-100 border
-                       border-green-300 rounded-md"
-            >
-                {{ session('message') }}
-            </div>
-        @endif
-
         <x-elements.card>
             <form class="mx-auto space-y-6">
-                <!-- Name Field -->
                 <div>
                     <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
                     <input
@@ -141,8 +127,6 @@ new class extends Component {
                     />
                     @error('name') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
                 </div>
-
-                <!-- Description Field -->
                 <div>
                     <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
                     <textarea
@@ -155,13 +139,12 @@ new class extends Component {
                     ></textarea>
                     @error('description') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
                 </div>
-
-                <!-- Share Toggle -->
                 <div class="flex items-center space-x-4">
                     <label for="is_shared" class="relative inline-flex items-center cursor-pointer">
                         <input
                             type="checkbox"
                             id="is_shared"
+                            name="is_shared"
                             wire:model.defer="is_shared"
                             class="sr-only peer"
                         />
@@ -178,7 +161,7 @@ new class extends Component {
                         OrgChart?</label>
                 </div>
 
-                @if($this->orgChart->share_uuid && $this->is_shared)
+                @if($orgChart->share_uuid)
                     <div class="flex items-start flex-col">
                         <span class="text-sm text-gray-600">
                             {{ url('/') . '/public/' . ($orgChart->share_uuid ?? 'your-share-uuid') }}
@@ -236,19 +219,53 @@ new class extends Component {
                         <span class="text-sm text-blue-600">Uploading...</span>
                     </div>
                     <div class="flex justify-end mt-2">
-                        <x-button type="submit" size="lg" wire:click="saveOrgChart">
+                        <x-button type="button" size="lg" wire:click="saveOrgChart">
                             Save Changes
                         </x-button>
                     </div>
                     @if ($dataContent)
                         <div class="mt-4">
-                            <p class="text-sm text-gray-700">Uploaded file
-                                content: {{ $data->getClientOriginalName() }}</p>
-                            <pre class="mt-2 p-2 bg-gray-100 rounded-md overflow-auto text-xs text-gray-600">
+                            <p class="text-sm text-gray-700">
+                                Uploaded file content: {{ $data->getClientOriginalName() }}
+                            </p>
+                            <div
+                                x-data="{ showJson: false }"
+                                class="border border-gray-200 rounded-md"
+                            >
+                                <button
+                                    @click="showJson = !showJson"
+                                    type="button"
+                                    class="flex w-full justify-between p-2 bg-gray-200 hover:bg-gray-300 focus:outline-none
+                       focus:ring-2 focus:ring-blue-500 transition-colors rounded-t-md"
+                                >
+                                    <span class="font-medium text-gray-700">View JSON</span>
+                                    <svg
+                                        class="w-5 h-5 text-gray-700 transform transition-transform"
+                                        :class="{ 'rotate-180': showJson }"
+                                        fill="currentColor"
+                                        viewBox="0 0 20 20"
+                                    >
+                                        <path
+                                            fill-rule="evenodd"
+                                            d="M5.23 7.21a.75.75 0 011.06.02L10 11.2l3.71-3.97a.75.75 0 111.08 1.04l-4.25 4.54a.75.75 0 01-1.08 0L5.23 8.27a.75.75 0 01.02-1.06z"
+                                            clip-rule="evenodd"
+                                        />
+                                    </svg>
+                                </button>
+                                <div
+                                    x-show="showJson"
+                                    x-collapse
+                                    class="overflow-auto p-2 bg-white rounded-b-md"
+                                    style="display: none;"
+                                >
+                <pre class="text-xs text-gray-700 whitespace-pre-wrap">
 {{ $dataContent }}
-                            </pre>
+                </pre>
+                                </div>
+                            </div>
                         </div>
                     @endif
+
                 </div>
             </form>
         </x-elements.card>

@@ -7,7 +7,7 @@
                     {{ $title ?? 'OrgChart 1' }}
                 </span>
                 <span
-                    class="top-5 left-5 px-2 py-1 text-xs font-medium bg-green-100 text-green-600 rounded-lg">
+                    class="top-5 left-5 px-2 py-1 text-xs font-medium bg-{{$badge=='Public' ? 'green':'orange'}}-100 text-{{$badge=='Public' ? 'green':'orange'}}-600 rounded-lg">
                     {{ $badge ?? 'Public' }}
                 </span>
             </div>

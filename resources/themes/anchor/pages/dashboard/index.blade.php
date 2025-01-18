@@ -1,5 +1,6 @@
 <?php
 
+use Filament\Notifications\Notification;
 use function Laravel\Folio\{middleware, name};
 use Livewire\Volt\Component;
 
@@ -34,7 +35,10 @@ new class extends Component {
 
         $this->reset(['name', 'description']);
         $this->dispatch('close-modal');
-        session()->flash('message', 'OrgChart added successfully!');
+        Notification::make()
+            ->title('OrgChart added successfully!')
+            ->success()
+            ->send();
     }
 
     public function deleteOrgChart($id)
@@ -43,7 +47,10 @@ new class extends Component {
         $orgChart->delete();
 
         $this->orgCharts = auth()->user()->orgCharts;
-        session()->flash('message', 'OrgChart deleted successfully!');
+        Notification::make()
+            ->title('OrgChart deleted successfully!')
+            ->success()
+            ->send();
     }
 }
 ?>
