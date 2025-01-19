@@ -12,7 +12,7 @@ name('organization.view');
             <div class="space-y-0.5 flex flex-row">
                 <h3 class="text-lg sm:text-xl font-semibold tracking-tight dark:text-zinc-100">{{$orgChart->name}}</h3>
                 <span style="max-height: 28px"
-                      class="top-5 left-5 px-2 py-1 text-xs font-medium bg-{{$orgChart->is_shared=='Public' ? 'green':'orange'}}-100 text-{{$orgChart->is_shared=='Public' ? 'green':'orange'}}-600 rounded-lg ml-2">
+                      class="top-5 left-5 px-2 py-1 text-xs font-medium bg-{{$orgChart->is_shared ? 'green':'orange'}}-100 text-{{$orgChart->is_shared ? 'green':'orange'}}-600 rounded-lg ml-2">
                     {{$orgChart->is_shared ? 'Public' : 'Private'}}
                 </span>
             </div>
