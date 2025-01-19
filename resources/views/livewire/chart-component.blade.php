@@ -4,17 +4,27 @@
             <!-- Top Bar -->
             <div
                 class="my-orgchart-topbar flex flex-col sm:flex-row items-start sm:items-center justify-between mb-3 border-b border-gray-200 pb-3 space-y-3 sm:space-y-0">
-                <h2 class="my-orgchart-title text-xl font-semibold">Organization Chart</h2>
+                <h2 class="my-orgchart-title text-xl sm:text-2xl font-semibold">Organization Chart</h2>
                 <div
-                    class="my-orgchart-search flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
+                    class="my-orgchart-controls flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
                     <div class="relative w-full sm:w-auto" x-data="{ open: false }">
-                        <x-button
+                        <div
+                            class="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
+
+                            <x-button onclick="setChartLayout('horizontal')" class="w-full sm:w-auto" color="secondary">
+                                Horizontal
+                            </x-button>
+                            <x-button onclick="setChartLayout('compact')" class="w-full sm:w-auto" color="secondary">
+                                Compact
+                            </x-button>
+                            <x-button
                             @click="open = ! open"
                             color="secondary"
                             class="w-full sm:w-auto"
                         >
                             Export
                         </x-button>
+                        </div>
                         <ul
                             class="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-lg z-20"
                             x-show="open"
@@ -65,6 +75,7 @@
                             </li>
                         </ul>
                     </div>
+
                     <input
                         type="text"
                         class="my-orgchart-search-input form-input border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500 w-full sm:w-64"
@@ -75,9 +86,13 @@
                     <x-button onclick="location.reload()" class="w-full sm:w-auto">
                         Refresh
                     </x-button>
+
+
                 </div>
             </div>
+
             <div class="my-orgchart-container border border-gray-200 rounded-md p-4 bg-gray-50 w-full h-full"></div>
+
             <div
                 id="myOrgChartNodeModal"
                 class="my-orgchart-modal hidden fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center z-50 px-4"
@@ -101,7 +116,6 @@
                     </div>
                 </div>
             </div>
-
         </div>
     @else
         <div class="bg-yellow-100 text-yellow-700 border border-yellow-300 p-4 rounded">
@@ -125,7 +139,7 @@
         const myOrgChartData = @json($jsonData);
         let myOrgChart;
 
-        // Filtering
+        let currentLayout = 'compact';
         function myOrgChartFilter(e) {
             const v = e.target.value.toLowerCase();
             myOrgChart.clearHighlighting();
@@ -145,7 +159,6 @@
             myOrgChart.data(d).render().fit();
         }
 
-        // Modal logic (no Bootstrap)
         function myOrgChartOpenModal(id, name, position, image) {
             document.getElementById('myOrgChartModalTitle').innerText = name;
             document.getElementById('myOrgChartModalBody').innerHTML = `
@@ -168,7 +181,6 @@
             document.getElementById('myOrgChartNodeModal').classList.add('hidden');
         }
 
-        // Export PDF
         function myOrgChartDownloadPdf() {
             myOrgChart.exportImg({
                 save: false,
@@ -185,15 +197,31 @@
             });
         }
 
+        function setChartLayout(layout) {
+            if (layout === 'horizontal') {
+                myOrgChart
+                    .compact(false)
+                    .render()
+                    .fit();
+                currentLayout = 'horizontal';
+            } else if (layout === 'compact') {
+                myOrgChart
+                    .compact(true)
+                    .render()
+                    .fit();
+                currentLayout = 'compact';
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function () {
             myOrgChart = new d3.OrgChart()
                 .container('.my-orgchart-container')
                 .data(myOrgChartData)
-                .nodeHeight((d) => 85 + 25)
-                .nodeWidth((d) => 220 + 2)
-                .childrenMargin((d) => 50)
-                .compactMarginBetween((d) => 35)
-                .compactMarginPair((d) => 30)
+                .nodeWidth(x => 220)
+                .nodeHeight(x => 110)
+                .childrenMargin(x => 50)
+                .compactMarginBetween(x => 35)
+                .compactMarginPair(x => 30)
                 .neighbourMargin((a, b) => 20)
                 .nodeUpdate(function () {
                     d3.select(this).select('.node-rect').attr('stroke', 'none');
@@ -238,7 +266,6 @@
                 .render()
                 .fit();
 
-            // Make the chart responsive by recalculating dimensions on window resize
             window.addEventListener('resize', function () {
                 myOrgChart.render().fit();
             });
