@@ -12,9 +12,7 @@ use function Laravel\Folio\{middleware, name};
                 :border="false"
             />
         </div>
-        <x-elements.card>
             @livewire('chart-component', ['jsonData' => $orgChart->json_data])
-        </x-elements.card>
     </x-app.container>
 </x-layouts.public>
 

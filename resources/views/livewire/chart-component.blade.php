@@ -1,8 +1,9 @@
 <div>
     @if($jsonData)
-        <div class="my-orgchart-wrapper w-full mx-auto px-4 sm:px-6 lg:px-8 h-screen">
-            <div
-                class="my-orgchart-topbar flex flex-col sm:flex-row items-start sm:items-center justify-between mb-3  pb-3 space-y-3 sm:space-y-0">
+        <div class="my-orgchart-wrapper w-full h-screen">
+            <div class="my-orgchart-container border border-gray-200 rounded-md p-4 bg-gray-50 w-full h-full">
+                <div
+                class="my-orgchart-topbar flex flex-col sm:flex-row items-center sm:items-center justify-center mb-3  pb-3 space-y-3 sm:space-y-0">
                 <div
                     class="my-orgchart-controls flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
                     <div class="relative w-full sm:w-auto" x-data="{ open: false }">
@@ -85,9 +86,7 @@
                     </x-button>
                 </div>
             </div>
-
-            <div class="my-orgchart-container border border-gray-200 rounded-md p-4 bg-gray-50 w-full h-full"></div>
-
+            </div>
             <div
                 id="myOrgChartNodeModal"
                 class="my-orgchart-modal hidden fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center z-50 px-4"

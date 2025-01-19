@@ -28,9 +28,7 @@ name('organization.view');
                 {{ session('message') }}
             </div>
         @endif
-        <x-elements.card>
             @livewire('chart-component', ['jsonData' => $orgChart->json_data])
-        </x-elements.card>
     </x-app.container>
 </x-layouts.app>
 
