@@ -28,11 +28,9 @@ name('organization.view');
                 {{ session('message') }}
             </div>
         @endif
-        <div class="flex flex-col w-full mt-6 space-y-5 md:flex-row lg:mt-0 md:space-y-0 md:space-x-5">
-            <x-elements.card>
-                @livewire('chart-component', ['jsonData' => $orgChart->json_data])
-            </x-elements.card>
-        </div>
+        <x-elements.card>
+            @livewire('chart-component', ['jsonData' => $orgChart->json_data])
+        </x-elements.card>
     </x-app.container>
 </x-layouts.app>
 
