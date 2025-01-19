@@ -223,84 +223,73 @@
                     d3.select(this).select('.node-rect').attr('stroke', 'none');
                 })
                 .nodeContent(function (d, i, arr, state) {
-                    // Decide on highlight or normal border
                     const highlightBorder =
                         d.data._highlighted || d.data._upToTheRootHighlighted
                             ? '5px solid #70db70'
                             : '1px solid #E4E2E9';
-
-                    // For responsiveness, you can clamp width/height if desired:
                     const nodeWidth = Math.min(d.width, window.innerWidth * 0.8);
                     const nodeHeight = Math.min(d.height, 200);
-
-                    const imageDiffVert = 27; // (25 + 2 in your snippet)
-
+                    const imageDiffVert = 27;
                     const color = '#FFFFFF';
-
-                    // Return markup with highlight and onclick
                     return `
-    <div
-      style="
-        width: ${nodeWidth}px;
-        height: ${nodeHeight}px;
-        padding-top: ${imageDiffVert - 2}px;
-        padding-left: 1px;
-        padding-right: 1px;
-        cursor: pointer;
-      "
-      onclick="myOrgChartOpenModal('${d.data.id}','${d.data.name}','${d.data.title}','${d.data.image}')"
-    >
-      <div
-        style="
-          font-family: 'Inter', sans-serif;
-          background-color: ${color};
-          margin-left: -1px;
-          width: ${nodeWidth - 2}px;
-          height: ${nodeHeight - imageDiffVert}px;
-          border-radius: 10px;
-          border: ${highlightBorder};
-        "
-      >
-        <!-- ID in top-right corner -->
-        <div style="display:flex;justify-content:flex-end;margin-top:5px;margin-right:8px">
-          #${d.data.id}
-        </div>
+                <div
+                  style="
+                    width: ${nodeWidth}px;
+                    height: ${nodeHeight}px;
+                    padding-top: ${imageDiffVert - 2}px;
+                    padding-left: 1px;
+                    padding-right: 1px;
+                    cursor: pointer;
+                  "
+                  onclick="myOrgChartOpenModal('${d.data.id}','${d.data.name}','${d.data.title}','${d.data.image}')"
+                >
+                  <div
+                    style="
+                      font-family: 'Inter', sans-serif;
+                      background-color: ${color};
+                      margin-left: -1px;
+                      width: ${nodeWidth - 2}px;
+                      height: ${nodeHeight - imageDiffVert}px;
+                      border-radius: 10px;
+                      border: ${highlightBorder};
+                    "
+                  >
+                    <div style="display:flex;justify-content:flex-end;margin-top:5px;margin-right:8px">
+                      #${d.data.id}
+                    </div>
 
-        <!-- Blank circle behind image -->
-        <div
-          style="
-            background-color: ${color};
-            margin-top: ${-imageDiffVert - 20}px;
-            margin-left: 15px;
-            border-radius: 100px;
-            width: 50px;
-            height: 50px;
-          "
-        ></div>
+                    <div
+                      style="
+                        background-color: ${color};
+                        margin-top: ${-imageDiffVert - 20}px;
+                        margin-left: 15px;
+                        border-radius: 100px;
+                        width: 50px;
+                        height: 50px;
+                      "
+                    ></div>
 
-        <!-- Actual image -->
-        <div style="margin-top: ${-imageDiffVert - 20}px;">
-          <img
-            src="${d.data.image}"
-            style="
-              margin-left: 20px;
-              border-radius: 100px;
-              width: 40px;
-              height: 40px;
-            "
-          />
-        </div>
+                    <div style="margin-top: ${-imageDiffVert - 20}px;">
+                      <img
+                        src="${d.data.image}"
+                        style="
+                          margin-left: 20px;
+                          border-radius: 100px;
+                          width: 40px;
+                          height: 40px;
+                        "
+                      />
+                    </div>
 
-        <!-- Name/title -->
-        <div style="font-size:15px;color:#08011E;margin-left:20px;margin-top:10px;">
-          ${d.data.name}
-        </div>
-        <div style="color:#716E7B;margin-left:20px;margin-top:3px;font-size:10px;">
-          ${d.data.title}
-        </div>
-      </div>
-    </div>
-  `;
+                    <div style="font-size:15px;color:#08011E;margin-left:20px;margin-top:10px;">
+                      ${d.data.name}
+                    </div>
+                    <div style="color:#716E7B;margin-left:20px;margin-top:3px;font-size:10px;">
+                      ${d.data.title}
+                    </div>
+                  </div>
+                </div>
+              `;
                 })
 
                 .compact(true)
