@@ -119,10 +119,6 @@
     @endif
 </div>
 
-@push('styles')
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.x/dist/tailwind.min.css" rel="stylesheet"/>
-@endpush
-
 @push('scripts')
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/d3-org-chart@3.1.0"></script>
