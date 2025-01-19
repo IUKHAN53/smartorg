@@ -2,9 +2,11 @@
     @if($jsonData)
         <div class="my-orgchart-wrapper max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Top Bar -->
-            <div class="my-orgchart-topbar flex flex-col sm:flex-row items-start sm:items-center justify-between mb-3 border-b border-gray-200 pb-3 space-y-3 sm:space-y-0">
+            <div
+                class="my-orgchart-topbar flex flex-col sm:flex-row items-start sm:items-center justify-between mb-3 border-b border-gray-200 pb-3 space-y-3 sm:space-y-0">
                 <h2 class="my-orgchart-title text-xl font-semibold">Organization Chart</h2>
-                <div class="my-orgchart-search flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
+                <div
+                    class="my-orgchart-search flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
                     <div class="relative w-full sm:w-auto" x-data="{ open: false }">
                         <x-button
                             @click="open = ! open"
@@ -187,11 +189,11 @@
             myOrgChart = new d3.OrgChart()
                 .container('.my-orgchart-container')
                 .data(myOrgChartData)
-                .nodeWidth(x => 220)
-                .nodeHeight(x => 110)
-                .childrenMargin(x => 50)
-                .compactMarginBetween(x => 35)
-                .compactMarginPair(x => 30)
+                .nodeHeight((d) => 85 + 25)
+                .nodeWidth((d) => 220 + 2)
+                .childrenMargin((d) => 50)
+                .compactMarginBetween((d) => 35)
+                .compactMarginPair((d) => 30)
                 .neighbourMargin((a, b) => 20)
                 .nodeUpdate(function () {
                     d3.select(this).select('.node-rect').attr('stroke', 'none');
