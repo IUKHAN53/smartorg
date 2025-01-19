@@ -1,7 +1,6 @@
 <div>
     @if($jsonData)
         <div class="my-orgchart-wrapper max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <!-- Top Bar -->
             <div
                 class="my-orgchart-topbar flex flex-col sm:flex-row items-start sm:items-center justify-between mb-3 border-b border-gray-200 pb-3 space-y-3 sm:space-y-0">
                 <h2 class="my-orgchart-title text-xl sm:text-2xl font-semibold">Organization Chart</h2>
