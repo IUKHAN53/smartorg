@@ -1,6 +1,6 @@
 <div>
     @if($jsonData)
-        <div class="my-orgchart-wrapper max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="my-orgchart-wrapper max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-screen">
             <div
                 class="my-orgchart-topbar flex flex-col sm:flex-row items-start sm:items-center justify-between mb-3  pb-3 space-y-3 sm:space-y-0">
                 <div
@@ -15,12 +15,12 @@
                                 Compact
                             </x-button>
                             <x-button
-                            @click="open = ! open"
-                            color="secondary"
-                            class="w-full sm:w-auto"
-                        >
-                            Export
-                        </x-button>
+                                @click="open = ! open"
+                                color="secondary"
+                                class="w-full sm:w-auto"
+                            >
+                                Export
+                            </x-button>
                         </div>
                         <ul
                             class="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-lg z-20"
@@ -119,6 +119,10 @@
     @endif
 </div>
 
+@push('styles')
+
+@endpush
+
 @push('scripts')
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/d3-org-chart@3.1.0"></script>
@@ -131,6 +135,7 @@
         let myOrgChart;
 
         let currentLayout = 'compact';
+
         function myOrgChartFilter(e) {
             const v = e.target.value.toLowerCase();
             myOrgChart.clearHighlighting();
@@ -222,12 +227,15 @@
                         ? '5px solid #70db70'
                         : '1px solid #E4E2E9';
 
+                    const nodeWidth = Math.min(d.width, window.innerWidth * 0.8);
+                    const nodeHeight = Math.min(d.height, 200);
+
                     return `
                       <div
                         style="
                           cursor:pointer;
-                          width:${d.width}px;
-                          height:${d.height}px;
+                          width:${nodeWidth}px;
+                          height:${nodeHeight}px;
                           position:relative;
                           background-color:#ffffff;
                           border-radius:10px;
