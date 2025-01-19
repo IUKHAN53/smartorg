@@ -2,14 +2,12 @@
     @if($jsonData)
         <div class="my-orgchart-wrapper max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div
-                class="my-orgchart-topbar flex flex-col sm:flex-row items-start sm:items-center justify-between mb-3 border-b border-gray-200 pb-3 space-y-3 sm:space-y-0">
-                <h2 class="my-orgchart-title text-xl sm:text-2xl font-semibold">Organization Chart</h2>
+                class="my-orgchart-topbar flex flex-col sm:flex-row items-start sm:items-center justify-between mb-3  pb-3 space-y-3 sm:space-y-0">
                 <div
                     class="my-orgchart-controls flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
                     <div class="relative w-full sm:w-auto" x-data="{ open: false }">
                         <div
                             class="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
-
                             <x-button onclick="setChartLayout('horizontal')" class="w-full sm:w-auto" color="secondary">
                                 Horizontal
                             </x-button>
@@ -85,8 +83,6 @@
                     <x-button onclick="location.reload()" class="w-full sm:w-auto">
                         Refresh
                     </x-button>
-
-
                 </div>
             </div>
 
