@@ -4,10 +4,10 @@
         <div class="flex justify-between items-center mb-3">
             <div class="flex">
                 <span class="text-lg font-bold tracking-tight leading-tight text-slate-700 dark:text-white mr-2">
-                    {{ $title ?? 'OrgChart 1' }}
+                    {{ $title ?? 'OrgChart' }}
                 </span>
                 <span
-                    class="top-5 left-5 px-2 py-1 text-xs font-medium bg-{{$badge=='Public' ? 'green':'orange'}}-100 text-{{$badge=='Public' ? 'green':'orange'}}-600 rounded-lg">
+                    class="top-5 left-5 px-2 py-1 text-xs font-medium bg-{{$badge=='Public' ? 'success':'info'}}-100 text-{{$badge=='Public' ? 'success':'info'}}-600 rounded-lg">
                     {{ $badge ?? 'Public' }}
                 </span>
             </div>
