@@ -11,10 +11,16 @@ name('organization.view');
         <div class="flex justify-between">
             <div class="space-y-0.5 flex flex-row">
                 <h3 class="text-lg sm:text-xl font-semibold tracking-tight dark:text-zinc-100">{{$orgChart->name}}</h3>
-                <span style="max-height: 28px"
-                      class="top-5 left-5 px-2 py-1 text-xs font-medium bg-{{$orgChart->is_shared ? 'success':'info'}}-100 text-{{$orgChart->is_shared ? 'success':'info'}}-600 rounded-lg ml-2">
-                    {{$orgChart->is_shared ? 'Public' : 'Private'}}
+                <span
+                    style="max-height: 28px"
+                    class="
+                        top-5 left-5 px-2 py-1 text-xs font-medium
+                        {{ $orgChart->is_shared ? 'bg-green-100 text-green-600' : 'bg-orange-100 text-orange-600' }}
+                        rounded-lg ml-2
+                      ">
+                    {{ $orgChart->is_shared ? 'Public' : 'Private' }}
                 </span>
+
             </div>
             <a
                 type="button"
@@ -28,7 +34,7 @@ name('organization.view');
                 {{ session('message') }}
             </div>
         @endif
-            @livewire('chart-component', ['jsonData' => $orgChart->json_data])
+        @livewire('chart-component', ['jsonData' => $orgChart->json_data])
     </x-app.container>
 </x-layouts.app>
 
